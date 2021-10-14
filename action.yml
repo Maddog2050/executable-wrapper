@@ -14,7 +14,7 @@ outputs:
     description: 'The exit code from the executable.'
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/index.js'
 branding:
   icon: gift
   color: purple

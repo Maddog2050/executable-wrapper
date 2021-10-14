@@ -23,5 +23,10 @@
     "@actions/exec": "^1.1.0",
     "string-argv": "^0.3.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@vercel/ncc": "^0.31.1"
+  },
+  "scripts": {
+    "build": "ncc build index.js -o dist --no-source-map-register"
+  }
 }
