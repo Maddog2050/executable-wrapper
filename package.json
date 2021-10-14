@@ -24,9 +24,11 @@
     "string-argv": "^0.3.1"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.31.1"
+    "@vercel/ncc": "^0.31.1",
+    "husky": "^7.0.2"
   },
   "scripts": {
-    "build": "ncc build index.js -o dist --no-source-map-register"
+    "build": "ncc build index.js -o dist --no-source-map-register",
+    "prepare": "husky install"
   }
 }
