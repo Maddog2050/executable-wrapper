@@ -1,0 +1,27 @@
+{
+  "name": "executable-wrapper",
+  "version": "1.0.0",
+  "description": "GitHub action that wraps executables and returns the stdout, stderr and exit code.",
+  "main": "index.js",
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "Executable",
+    "Wrapper"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maddog2050/executable-wrapper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Maddog2050/executable-wrapper/issues"
+  },
+  "homepage": "https://github.com/Maddog2050/executable-wrapper/issues",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/exec": "^1.1.0",
+    "string-argv": "^0.3.1"
+  },
+  "devDependencies": {}
+}

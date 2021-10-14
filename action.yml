@@ -1,0 +1,20 @@
+name: 'executable-wrapper'
+description: 'GitHub action that wraps executables and returns the stdout, stderr and exit code.'
+author: 'Maddog2050'
+inputs:
+  run_command:
+    description: 'The executable along with any parameters that need sto be run.'
+    required: true
+outputs:
+  stdout:
+    description: 'The stdout output from the executable.'
+  stderr:
+    description: 'The stderr output from the executable.'
+  exitcode:
+    description: 'The exit code from the executable.'
+runs:
+  using: 'node12'
+  main: 'index.js'
+branding:
+  icon: gift
+  color: purple
