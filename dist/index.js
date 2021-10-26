@@ -2883,15 +2883,16 @@ const { getExecOutput } = __nccwpck_require__(514);
 
 const stringArgv = __nccwpck_require__(453);
 
+String.prototype.replaceAll = function (search, replacement) {
+  var target = this;
+  return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 async function run() {
   core.debug("Starting executable-wrapper")
 
   const runCommand = core.getInput('run_command', { required: true });
-  const encodeStdout = core.getInput('encode_stdout') === 'true';
-  const encodeStderr = core.getInput('encode_stderr') === 'true';
   core.debug(`Parameter - run_command: \'${runCommand}\'`);
-  core.debug(`Parameter - encode_stdout: \'${encodeStdout}\'`)
-  core.debug(`Parameter - encode_stderr: \'${encodeStderr}\'`)
 
   args = stringArgv.parseArgsStringToArgv(runCommand);
   command = args[0];
@@ -2911,8 +2912,8 @@ async function run() {
   core.debug(`stderr: ${output.stderr}`);
   core.debug(`exitcode: ${output.exitCode}`);
 
-  core.setOutput('stdout', (encodeStdout ? encodeURIComponent(output.stdout) : output.stdout));
-  core.setOutput('stderr', (encodeStderr ? encodeURIComponent(output.stderr) : output.stderr));
+  core.setOutput('stdout', output.stdout.replaceAll('\`', '\\\`'));
+  core.setOutput('stderr', output.stderr.replaceAll('\`', '\\\`'));
   core.setOutput('exitcode', output.exitCode);
 
   if (output.exitCode !== 0) {
