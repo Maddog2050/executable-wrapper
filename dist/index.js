@@ -2874,56 +2874,12 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 137:
-/***/ ((module) => {
-
-/**
- * Acts as a listener for @actions/exec, by capturing STDOUT and STDERR
- * streams, and exposing them via a contents attribute.
- *
- * @example
- * // Instantiate a new listener
- * const listener = new OutputListener();
- * // Register listener against STDOUT stream
- * await exec.exec('ls', ['-ltr'], {
- *  listeners: {
- *    stdout: listener.listener
- *  }
- * });
- * // Log out STDOUT contents
- * console.log(listener.contents);
- */
-class OutputListener {
-  constructor() {
-    this._buff = [];
-  }
-
-  get listener() {
-    const listen = function listen(data) {
-      this._buff.push(data);
-    };
-    return listen.bind(this);
-  }
-
-  get contents() {
-    return this._buff
-      .map(chunk => chunk.toString())
-      .join('');
-  }
-}
-
-module.exports = OutputListener;
-
-/***/ }),
-
 /***/ 239:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(186);
 const io = __nccwpck_require__(436);
-const { exec } = __nccwpck_require__(514);
-
-const OutputListener = __nccwpck_require__(137);
+const { getExecOutput } = __nccwpck_require__(514);
 
 const stringArgv = __nccwpck_require__(453);
 
@@ -2931,41 +2887,36 @@ async function run() {
   core.debug("Starting executable-wrapper")
 
   const runCommand = core.getInput('run_command', { required: true });
+  const encodeStdout = core.getInput('encode_stdout') === 'true';
+  const encodeStderr = core.getInput('encode_stderr') === 'true';
   core.debug(`Parameter - run_command: \'${runCommand}\'`);
+  core.debug(`Parameter - encode_stdout: \'${encodeStdout}\'`)
+  core.debug(`Parameter - encode_stderr: \'${encodeStderr}\'`)
 
   args = stringArgv.parseArgsStringToArgv(runCommand);
   command = args[0];
   args = args.slice(1);
 
-  // Create listeners to receive output (in memory) as well
-  const stdout = new OutputListener();
-  const stderr = new OutputListener();
-  const listeners = {
-    stdout: stdout.listener,
-    stderr: stderr.listener
-  };
-
   const options = {
-    listeners,
     ignoreReturnCode: true
   };
 
   // Check that the command exists
   io.which(command, true);
 
-  const exitCode = await exec(command, args, options);
+  const output = await getExecOutput(command, args, options);
 
-  core.debug(`Program exited with code ${exitCode}.`);
-  core.debug(`stdout: ${stdout.contents}`);
-  core.debug(`stderr: ${stderr.contents}`);
-  core.debug(`exitcode: ${exitCode}`);
+  core.debug(`Program exited with code ${output.exitCode}.`);
+  core.debug(`stdout: ${output.stdout}`);
+  core.debug(`stderr: ${output.stderr}`);
+  core.debug(`exitcode: ${output.exitCode}`);
 
-  core.setOutput('stdout', stdout.contents);
-  core.setOutput('stderr', stderr.contents);
-  core.setOutput('exitcode', exitCode.toString(10));
+  core.setOutput('stdout', (encodeStdout ? encodeURIComponent(output.stdout) : output.stdout));
+  core.setOutput('stderr', (encodeStderr ? encodeURIComponent(output.stderr) : output.stderr));
+  core.setOutput('exitcode', output.exitCode);
 
-  if (exitCode !== 0) {
-    core.setFailed(`Program exited with code ${exitCode}.`);
+  if (output.exitCode !== 0) {
+    core.setFailed(`Program exited with code ${output.exitCode}.`);
   }
 }
 

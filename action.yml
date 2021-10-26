@@ -5,6 +5,14 @@ inputs:
   run_command:
     description: 'The executable along with any parameters that need sto be run.'
     required: true
+  encode_stdout:
+    description: 'If true URI encodes the stdout (default false).'
+    required: false
+    default: 'false'
+  encode_stderr:
+    description: 'If true URI encodes the stderr (default false).'
+    required: false
+    default: 'false'
 outputs:
   stdout:
     description: 'The stdout output from the executable.'
