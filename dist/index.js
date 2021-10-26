@@ -2964,7 +2964,7 @@ async function run() {
   core.setOutput('stderr', stderr.contents);
   core.setOutput('exitcode', exitCode);
 
-  if (output.exitCode !== 0) {
+  if (exitCode !== 0) {
     core.setFailed(`Program exited with code ${exitCode}.`);
   }
 }
