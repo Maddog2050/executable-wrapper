@@ -1,6 +1,8 @@
 const core = require('@actions/core');
 const io = require('@actions/io');
-const { getExecOutput } = require('@actions/exec');
+const { exec } = require('@actions/exec');
+
+const OutputListener = require('./lib/output-listener');
 
 const stringArgv = require('string-argv');
 
@@ -14,26 +16,35 @@ async function run() {
   command = args[0];
   args = args.slice(1);
 
+  // Create listeners to receive output (in memory) as well
+  const stdout = new OutputListener();
+  const stderr = new OutputListener();
+  const listeners = {
+    stdout: stdout.listener,
+    stderr: stderr.listener
+  };
+
   const options = {
+    listeners,
     ignoreReturnCode: true
   };
 
   // Check that the command exists
   io.which(command, true);
 
-  const output = await getExecOutput(command, args, options);
+  const exitCode = await exec(command, args, options);
 
-  core.debug(`Program exited with code ${output.exitCode}.`);
-  core.debug(`stdout: ${output.stdout}`);
-  core.debug(`stderr: ${output.stderr}`);
-  core.debug(`exitcode: ${output.exitCode}`);
+  core.debug(`Program exited with code ${exitCode}.`);
+  core.debug(`stdout: ${stdout.contents}`);
+  core.debug(`stderr: ${stderr.contents}`);
+  core.debug(`exitcode: ${exitCode}`);
 
-  core.setOutput('stdout', output.stdout);
-  core.setOutput('stderr', output.stderr);
-  core.setOutput('exitcode', output.exitCode);
+  core.setOutput('stdout', stdout.contents);
+  core.setOutput('stderr', stderr.contents);
+  core.setOutput('exitcode', exitCode);
 
   if (output.exitCode !== 0) {
-    core.setFailed(`Program exited with code ${output.exitCode}.`);
+    core.setFailed(`Program exited with code ${exitCode}.`);
   }
 }
 
