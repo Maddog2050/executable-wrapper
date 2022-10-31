@@ -4032,8 +4032,11 @@ async function run() {
   args = args.slice(1);
 
   const options = {
-    ignoreReturnCode: true
+    ignoreReturnCode: true,
+    cwd: core.getInput('working-directory') || process.cwd()
   };
+
+  core.debug(`working-directory: ${options.cwd}`);
 
   // Check that the command exists
   io.which(command, true);

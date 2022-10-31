@@ -5,6 +5,9 @@ inputs:
   run_command:
     description: 'The executable along with any parameters that need sto be run.'
     required: true
+  working-directory:
+    description: 'The working directory for the command.'
+    required: false
 outputs:
   stdout:
     description: 'The stdout output from the executable.'
